@@ -1,0 +1,43 @@
+{
+    "id": "chatcmpl-4a854e9e-5bae-4256-9e9f-9c9e472c6c7a",
+    "choices": [
+        {
+            "finish_reason": "stop",
+            "index": 0,
+            "logprobs": null,
+            "message": {
+                "content": "Fast language models are crucial for efficient processing and analysis of large amounts of text data. They enable swift and accurate generation of text, translation, and summarization, making them indispensable for various applications. By accelerating language processing tasks, fast language models can significantly improve productivity and decision-making in fields like customer service, content creation, and research.",
+                "role": "assistant",
+                "annotations": null,
+                "executed_tools": null,
+                "function_call": null,
+                "reasoning": null,
+                "tool_calls": null
+            }
+        }
+    ],
+    "created": 1772370694,
+    "model": "llama-3.3-70b-versatile",
+    "object": "chat.completion",
+    "mcp_list_tools": null,
+    "service_tier": "on_demand",
+    "system_fingerprint": "fp_dae98b5ecb",
+    "usage": {
+        "completion_tokens": 68,
+        "prompt_tokens": 47,
+        "total_tokens": 115,
+        "completion_time": 0.231771384,
+        "completion_tokens_details": null,
+        "prompt_time": 0.002238447,
+        "prompt_tokens_details": null,
+        "queue_time": 0.048271543,
+        "total_time": 0.234009831
+    },
+    "usage_breakdown": null,
+    "x_groq": {
+        "id": "req_01kjmrd48zejvszjbbvts34269",
+        "debug": null,
+        "seed": 1601679616,
+        "usage": null
+    }
+}
