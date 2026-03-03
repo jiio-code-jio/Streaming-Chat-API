@@ -17,5 +17,6 @@ and it is limitated to per process not for per person
 
 
 #### In Phase E we completed streaming with SSE
+
 - We created a function generate_stream it takes str as params and we return the data in chunks and for each chunk we return yield
 - for each yield we return streaming response and keep mediatype "ttext/event-stream"
