@@ -16,3 +16,5 @@ Note : This is in-memory history if the applications restart it goes away
 and it is limitated to per process not for per person 
 
 
+#### In Phase E we completed streaming with SSE
+- We created a function 
