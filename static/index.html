@@ -632,7 +632,7 @@
     const es = new EventSource(`/chat/stream?prompt=${encodeURIComponent(prompt)}`);
 
     es.onmessage = (e) => {
-      fullText += e.data;
+      fullText += JSON.parse(e.data);  // JSON.parse restores all special chars
       // Update raw text — cursor stays at end
       bubble.textContent = fullText;
       bubble.appendChild(cursor);

@@ -1,7 +1,9 @@
+# app/routers/StreamSSE.py
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
+import json                                        # ← NEW
 from app.core.groq_client import get_client
-from app.core.memory import conversation_history  # shared history
+from app.core.memory import conversation_history
 
 router = APIRouter()
 
@@ -9,34 +11,27 @@ router = APIRouter()
 def generate_stream(prompt: str):
     client = get_client()
 
-    # Step 1: append user message to shared history BEFORE calling the LLM
-    conversation_history.append({
-        "role": "user",
-        "content": prompt
-    })
+    conversation_history.append({"role": "user", "content": prompt})
 
     stream = client.chat.completions.create(
-        messages=conversation_history,   # full history, not just current prompt
+        messages=conversation_history,
         model="llama-3.3-70b-versatile",
         temperature=0.5,
         max_completion_tokens=1024,
         stream=True,
     )
 
-    # Step 2: collect full response while streaming tokens to the client
     full_response = ""
 
     for chunk in stream:
         content = chunk.choices[0].delta.content
         if content:
             full_response += content
-            yield f"data: {content}\n\n"   # stream each token via SSE
+            # json.dumps encodes ALL special chars — newlines, quotes, backslashes
+            # Frontend uses JSON.parse() to restore the original token perfectly
+            yield f"data: {json.dumps(content)}\n\n"   # ← CHANGED
 
-    # Step 3: once stream ends, save assistant reply to history
-    conversation_history.append({
-        "role": "assistant",
-        "content": full_response
-    })
+    conversation_history.append({"role": "assistant", "content": full_response})
 
 
 @router.get("/chat/stream")
