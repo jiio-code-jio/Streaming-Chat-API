@@ -3,50 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StreamChat — AI Engineer Project 01</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg:        #0e0e0e;
-      --bg-panel:  #161616;
-      --bg-msg:    #1c1c1c;
-      --bg-user:   #1a2535;
-      --border:    #2a2a2a;
-      --border-hi: #3a3a3a;
-      --text:      #e8e4dc;
-      --text-dim:  #6b6861;
-      --text-mid:  #a09d97;
-      --cyan:      #4af0c4;
-      --cyan-dim:  rgba(74, 240, 196, 0.12);
-      --cyan-glow: rgba(74, 240, 196, 0.25);
-      --red:       #ff5f57;
-      --yellow:    #febc2e;
-      --green:     #28c840;
-      --mono:      'IBM Plex Mono', monospace;
-      --sans:      'DM Sans', sans-serif;
-    }
+  <title>StreamChat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+  <!-- Markdown renderer -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <!-- Code syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Tokens / Variables ── */
+    :root {
+      --bg:           #ffffff;
+      --bg-sidebar:   #f7f6f3;
+      --bg-hover:     #f1f0ed;
+      --border:       #e8e7e4;
+      --border-mid:   #d3d1cb;
+      --text:         #1a1a1a;
+      --text-mid:     #787774;
+      --text-dim:     #9b9a97;
+      --accent:       #2383e2;
+      --accent-light: #e8f3fd;
+      --green:        #0f7b6c;
+      --green-light:  #e6f4f1;
+      --code-bg:      #f7f6f3;
+      --code-border:  #e8e7e4;
+      --user-bg:      #f0f7ff;
+      --user-border:  #cce0f7;
+      --mono:         'JetBrains Mono', monospace;
+      --sans:         'Sora', sans-serif;
+      --serif:        'Crimson Pro', serif;
+    }
 
     body {
       font-family: var(--sans);
-      background: var(--bg);
+      font-size: 15px;
+      line-height: 1.7;
       color: var(--text);
+      background: var(--bg);
       height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* ── Top bar ── */
+    /* ── Top bar — Notion-style ── */
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 20px;
-      height: 48px;
+      height: 45px;
       border-bottom: 1px solid var(--border);
-      background: var(--bg-panel);
+      background: var(--bg-sidebar);
       flex-shrink: 0;
       user-select: none;
     }
@@ -54,31 +67,27 @@
     .topbar-left {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
     }
 
-    .traffic-lights {
-      display: flex;
-      gap: 6px;
+    .page-icon { font-size: 18px; }
+
+    .page-title {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
     }
 
-    .tl {
-      width: 12px; height: 12px;
-      border-radius: 50%;
-    }
-    .tl-red    { background: var(--red); }
-    .tl-yellow { background: var(--yellow); }
-    .tl-green  { background: var(--green); }
-
-    .topbar-title {
+    .model-tag {
       font-family: var(--mono);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-mid);
-      letter-spacing: 0.02em;
+      font-size: 11px;
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid #c8dff6;
+      border-radius: 4px;
+      padding: 2px 8px;
     }
-
-    .topbar-title span { color: var(--cyan); }
 
     .topbar-right {
       display: flex;
@@ -86,69 +95,59 @@
       gap: 10px;
     }
 
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
     .status-dot {
       width: 7px; height: 7px;
       border-radius: 50%;
       background: var(--green);
-      box-shadow: 0 0 6px var(--green);
       animation: pulse 2.5s infinite;
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; }
-      50%       { opacity: 0.4; }
-    }
-
-    .status-label {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-dim);
+      50%       { opacity: 0.35; }
     }
 
     .btn-reset {
       font-family: var(--mono);
       font-size: 11px;
-      color: var(--text-dim);
+      color: var(--text-mid);
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 4px 10px;
       cursor: pointer;
       transition: all 0.15s;
-      letter-spacing: 0.03em;
     }
 
     .btn-reset:hover {
-      border-color: var(--red);
-      color: var(--red);
-    }
-
-    /* ── Model badge ── */
-    .model-badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      background: var(--cyan-dim);
-      border: 1px solid rgba(74,240,196,0.2);
-      color: var(--cyan);
-      border-radius: 4px;
-      padding: 3px 8px;
-      letter-spacing: 0.04em;
+      border-color: #e03e3e;
+      color: #e03e3e;
+      background: #fdecea;
     }
 
     /* ── Messages area ── */
     #messages {
       flex: 1;
       overflow-y: auto;
-      padding: 24px 0;
+      padding: 32px 0 16px;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 0;
       scroll-behavior: smooth;
     }
 
     #messages::-webkit-scrollbar { width: 4px; }
     #messages::-webkit-scrollbar-track { background: transparent; }
-    #messages::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+    #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
     /* ── Empty state ── */
     .empty-state {
@@ -157,67 +156,171 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      padding: 40px;
+      gap: 10px;
+      padding: 60px 40px;
       text-align: center;
       pointer-events: none;
     }
 
-    .empty-icon {
-      font-size: 32px;
-      opacity: 0.3;
-    }
+    .empty-icon { font-size: 36px; opacity: 0.25; }
 
     .empty-title {
-      font-family: var(--mono);
-      font-size: 14px;
+      font-family: var(--serif);
+      font-size: 22px;
       color: var(--text-mid);
-      letter-spacing: 0.04em;
     }
 
     .empty-sub {
       font-size: 13px;
       color: var(--text-dim);
-      max-width: 320px;
+      max-width: 300px;
       line-height: 1.6;
     }
 
     /* ── Message rows ── */
     .msg-row {
       display: flex;
-      padding: 4px 24px;
-      animation: fadeSlide 0.2s ease forwards;
+      flex-direction: column;
+      padding: 6px 48px;
+      animation: fadeUp 0.18s ease forwards;
+      max-width: 860px;
+      margin: 0 auto;
+      width: 100%;
     }
 
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(4px); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .msg-row.user  { justify-content: flex-end; }
-    .msg-row.assistant { justify-content: flex-start; }
+    .msg-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .msg-row.user  .msg-label { color: var(--accent); }
+    .msg-row.assistant .msg-label { color: var(--green); }
 
     .msg-bubble {
-      max-width: 72%;
-      padding: 11px 15px;
-      border-radius: 8px;
-      font-size: 14px;
-      line-height: 1.65;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 14.5px;
+      line-height: 1.7;
       word-break: break-word;
     }
 
-    .msg-row.user .msg-bubble {
-      background: var(--bg-user);
-      border: 1px solid #243045;
-      color: var(--text);
+    /* During streaming: plain text with correct whitespace */
+    .msg-bubble.streaming {
+      white-space: pre-wrap;
       font-family: var(--sans);
     }
 
-    .msg-row.assistant .msg-bubble {
-      background: var(--bg-msg);
-      border: 1px solid var(--border);
+    .msg-row.user .msg-bubble {
+      background: var(--user-bg);
+      border: 1px solid var(--user-border);
       color: var(--text);
-      font-family: var(--sans);
+      white-space: pre-wrap;
+    }
+
+    .msg-row.assistant .msg-bubble {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    /* ── Markdown rendered content ── */
+    .msg-bubble p { margin-bottom: 10px; }
+    .msg-bubble p:last-child { margin-bottom: 0; }
+
+    .msg-bubble ul, .msg-bubble ol {
+      margin: 8px 0 8px 20px;
+    }
+
+    .msg-bubble li { margin-bottom: 4px; }
+
+    .msg-bubble h1, .msg-bubble h2, .msg-bubble h3 {
+      font-family: var(--serif);
+      font-weight: 600;
+      margin: 16px 0 8px;
+      color: var(--text);
+    }
+
+    .msg-bubble h1 { font-size: 22px; }
+    .msg-bubble h2 { font-size: 18px; }
+    .msg-bubble h3 { font-size: 16px; }
+
+    /* Inline code */
+    .msg-bubble code {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      color: #e03e3e;
+    }
+
+    /* Code blocks */
+    .msg-bubble pre {
+      background: var(--bg-sidebar);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+
+    .msg-bubble pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* Code block header showing language */
+    .code-wrapper {
+      position: relative;
+      margin: 10px 0;
+    }
+
+    .code-lang {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      background: var(--bg-sidebar);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      padding: 4px 12px;
+      display: inline-block;
+    }
+
+    .code-wrapper pre {
+      margin: 0;
+      border-radius: 0 6px 6px 6px;
+    }
+
+    /* Blockquote */
+    .msg-bubble blockquote {
+      border-left: 3px solid var(--border-mid);
+      padding-left: 14px;
+      color: var(--text-mid);
+      margin: 8px 0;
+    }
+
+    /* Horizontal rule */
+    .msg-bubble hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 14px 0;
     }
 
     /* ── Streaming cursor ── */
@@ -225,11 +328,10 @@
       display: inline-block;
       width: 2px;
       height: 14px;
-      background: var(--cyan);
+      background: var(--text-mid);
       margin-left: 2px;
       vertical-align: middle;
-      box-shadow: 0 0 6px var(--cyan-glow);
-      animation: blink 0.8s step-end infinite;
+      animation: blink 0.9s step-end infinite;
     }
 
     @keyframes blink {
@@ -237,152 +339,109 @@
       50%       { opacity: 0; }
     }
 
-    /* ── Role label ── */
-    .msg-label {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      margin-bottom: 3px;
-      text-transform: uppercase;
+    /* ── Divider between turns ── */
+    .turn-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 10px 48px;
+      max-width: 764px;
+      width: calc(100% - 96px);
+      align-self: center;
     }
-
-    .msg-row.user      .msg-label { color: #4a7fcb; text-align: right; }
-    .msg-row.assistant .msg-label { color: var(--cyan); }
-
-    .msg-wrap {
-      display: flex;
-      flex-direction: column;
-      max-width: 72%;
-    }
-
-    .msg-row.user .msg-wrap { align-items: flex-end; }
 
     /* ── Input area ── */
     .input-area {
       border-top: 1px solid var(--border);
-      background: var(--bg-panel);
-      padding: 16px 20px;
+      background: var(--bg);
+      padding: 14px 48px 12px;
       flex-shrink: 0;
     }
 
-    .input-row {
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-      max-width: 760px;
+    .input-inner {
+      max-width: 764px;
       margin: 0 auto;
     }
 
-    .input-box {
-      flex: 1;
-      background: var(--bg-msg);
+    .input-box-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 11px 14px;
+      padding: 10px 12px;
+      background: var(--bg);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .input-box-wrap:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    textarea#input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
       color: var(--text);
       font-family: var(--sans);
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
       resize: none;
-      outline: none;
-      min-height: 44px;
-      max-height: 140px;
-      transition: border-color 0.15s;
+      min-height: 24px;
+      max-height: 160px;
       overflow-y: auto;
     }
 
-    .input-box::placeholder { color: var(--text-dim); }
-
-    .input-box:focus {
-      border-color: var(--border-hi);
-      box-shadow: 0 0 0 2px var(--cyan-dim);
-    }
-
-    .input-box:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    textarea#input::placeholder { color: var(--text-dim); }
+    textarea#input:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn-send {
-      width: 44px;
-      height: 44px;
-      border-radius: 8px;
-      background: var(--cyan);
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      background: var(--accent);
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.15s;
       flex-shrink: 0;
+      transition: all 0.15s;
     }
 
-    .btn-send:hover:not(:disabled) {
-      background: #6af5d0;
-      box-shadow: 0 0 14px var(--cyan-glow);
-    }
-
-    .btn-send:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-    }
+    .btn-send:hover:not(:disabled) { background: #1a6ec4; }
+    .btn-send:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .btn-send svg {
-      width: 18px; height: 18px;
+      width: 15px; height: 15px;
       fill: none;
-      stroke: #0e0e0e;
+      stroke: white;
       stroke-width: 2.2;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
 
-    /* Loading spinner inside send button */
     .spinner {
-      width: 18px; height: 18px;
-      border: 2px solid rgba(0,0,0,0.2);
-      border-top-color: #0e0e0e;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Footer hint ── */
     .input-hint {
       font-family: var(--mono);
       font-size: 10px;
       color: var(--text-dim);
-      text-align: center;
-      margin-top: 8px;
-      letter-spacing: 0.04em;
-    }
-
-    /* ── Token counter ── */
-    .token-bar {
+      margin-top: 7px;
       display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 6px;
+      justify-content: space-between;
     }
 
-    .token-stat {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text-dim);
-    }
-
-    .token-stat span {
-      color: var(--cyan);
-    }
-
-    /* ── Error message ── */
-    .msg-row.error .msg-bubble {
-      background: rgba(255,95,87,0.08);
-      border-color: rgba(255,95,87,0.25);
-      color: #ff8a85;
-      font-family: var(--mono);
-      font-size: 13px;
-    }
+    .token-info { color: var(--text-dim); }
+    .token-info span { color: var(--accent); }
   </style>
 </head>
 <body>
@@ -390,17 +449,15 @@
 <!-- Top bar -->
 <header class="topbar">
   <div class="topbar-left">
-    <div class="traffic-lights">
-      <div class="tl tl-red"></div>
-      <div class="tl tl-yellow"></div>
-      <div class="tl tl-green"></div>
-    </div>
-    <div class="topbar-title">stream<span>chat</span>.py</div>
-    <div class="model-badge">llama-3.3-70b-versatile</div>
+    <div class="page-icon">💬</div>
+    <div class="page-title">Streaming Chat API</div>
+    <div class="model-tag">llama-3.3-70b-versatile</div>
   </div>
   <div class="topbar-right">
-    <div class="status-dot"></div>
-    <div class="status-label">groq · connected</div>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      groq · live
+    </div>
     <button class="btn-reset" onclick="resetChat()">↺ reset</button>
   </div>
 </header>
@@ -408,54 +465,77 @@
 <!-- Messages -->
 <div id="messages">
   <div class="empty-state" id="empty-state">
-    <div class="empty-icon">⚡</div>
-    <div class="empty-title">SSE streaming active</div>
-    <div class="empty-sub">Type a message to start. Tokens stream token-by-token via Server-Sent Events — FastAPI + Groq under the hood.</div>
+    <div class="empty-icon">💬</div>
+    <div class="empty-title">Start a conversation</div>
+    <div class="empty-sub">Tokens stream live via SSE — FastAPI + Groq under the hood.</div>
   </div>
 </div>
 
 <!-- Input -->
 <div class="input-area">
-  <div class="input-row">
-    <textarea
-      id="input"
-      class="input-box"
-      placeholder="Send a message…"
-      rows="1"
-      onkeydown="handleKey(event)"
-      oninput="autoResize(this)"
-    ></textarea>
-    <button class="btn-send" id="send-btn" onclick="sendMessage()">
-      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
+  <div class="input-inner">
+    <div class="input-box-wrap">
+      <textarea
+        id="input"
+        placeholder="Ask anything…"
+        rows="1"
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"
+      ></textarea>
+      <button class="btn-send" id="send-btn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="input-hint">
+      <span>↵ send &nbsp;·&nbsp; shift+↵ newline</span>
+      <span class="token-info">tokens <span id="token-count">0</span> &nbsp;·&nbsp; turns <span id="msg-count">0</span></span>
+    </div>
   </div>
-  <div class="token-bar">
-    <div class="token-stat">session tokens <span id="token-count">0</span></div>
-    <div class="token-stat">messages <span id="msg-count">0</span></div>
-  </div>
-  <div class="input-hint">↵ send · shift+↵ newline · ↺ reset clears history</div>
 </div>
 
 <script>
-  let isStreaming = false;
+  // ── Configure marked ──────────────────────────────────────────
+  marked.setOptions({
+    breaks: true,       // \n becomes <br> inside paragraphs
+    gfm: true,          // GitHub-flavoured markdown
+    highlight: (code, lang) => {
+      if (lang && hljs.getLanguage(lang)) {
+        return hljs.highlight(code, { language: lang }).value;
+      }
+      return hljs.highlightAuto(code).value;
+    }
+  });
+
+  // Override code block renderer to add language label
+  const renderer = new marked.Renderer();
+  renderer.code = (code, lang) => {
+    const highlighted = (lang && hljs.getLanguage(lang))
+      ? hljs.highlight(code, { language: lang }).value
+      : hljs.highlightAuto(code).value;
+    const langLabel = lang
+      ? `<div class="code-lang">${lang}</div>`
+      : '';
+    return `<div class="code-wrapper">${langLabel}<pre><code class="hljs">${highlighted}</code></pre></div>`;
+  };
+  marked.use({ renderer });
+
+  // ── State ─────────────────────────────────────────────────────
+  let isStreaming   = false;
   let sessionTokens = 0;
-  let messageCount = 0;
+  let turnCount     = 0;
 
   const messagesEl = document.getElementById('messages');
   const inputEl    = document.getElementById('input');
   const sendBtn    = document.getElementById('send-btn');
-  const emptyState = document.getElementById('empty-state');
 
+  // ── Helpers ───────────────────────────────────────────────────
   function autoResize(el) {
     el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+    el.style.height = Math.min(el.scrollHeight, 160) + 'px';
   }
 
   function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   }
 
   function scrollToBottom() {
@@ -463,64 +543,82 @@
   }
 
   function hideEmpty() {
-    if (emptyState) emptyState.style.display = 'none';
+    const el = document.getElementById('empty-state');
+    if (el) el.remove();
   }
 
+  function setLoading(on) {
+    isStreaming        = on;
+    inputEl.disabled   = on;
+    sendBtn.disabled   = on;
+    sendBtn.innerHTML  = on
+      ? '<div class="spinner"></div>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+  }
+
+  function addDivider() {
+    const hr = document.createElement('hr');
+    hr.className = 'turn-divider';
+    messagesEl.appendChild(hr);
+  }
+
+  // Build a message row; returns the bubble element
   function appendMessage(role, text = '') {
     hideEmpty();
-    const row = document.createElement('div');
+    const row    = document.createElement('div');
     row.className = `msg-row ${role}`;
 
-    const wrap = document.createElement('div');
-    wrap.className = 'msg-wrap';
-
-    const label = document.createElement('div');
+    const label  = document.createElement('div');
     label.className = 'msg-label';
-    label.textContent = role === 'user' ? 'you' : 'llm';
+    label.textContent = role === 'user' ? 'You' : 'Assistant';
 
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
-    bubble.textContent = text;
 
-    wrap.appendChild(label);
-    wrap.appendChild(bubble);
-    row.appendChild(wrap);
+    if (role === 'user') {
+      // User messages: plain text, pre-wrap handles newlines
+      bubble.textContent = text;
+    } else {
+      // Assistant during streaming: pre-wrap raw text
+      bubble.classList.add('streaming');
+      bubble.textContent = text;
+    }
+
+    row.appendChild(label);
+    row.appendChild(bubble);
     messagesEl.appendChild(row);
     scrollToBottom();
     return bubble;
   }
 
-  function setLoading(loading) {
-    isStreaming = loading;
-    inputEl.disabled = loading;
-    sendBtn.disabled = loading;
-    sendBtn.innerHTML = loading
-      ? '<div class="spinner"></div>'
-      : '<svg viewBox="0 0 24 24" fill="none" stroke="#0e0e0e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+  // Once streaming finishes, render the accumulated text as markdown
+  function renderMarkdown(bubble, fullText) {
+    bubble.classList.remove('streaming');
+    bubble.innerHTML = marked.parse(fullText);
+    scrollToBottom();
   }
 
-  function updateCounters(newTokens) {
-    sessionTokens += newTokens;
-    messageCount += 1;
+  function updateCounters(tokens) {
+    sessionTokens += tokens;
+    turnCount     += 1;
     document.getElementById('token-count').textContent = sessionTokens;
-    document.getElementById('msg-count').textContent = messageCount;
+    document.getElementById('msg-count').textContent   = turnCount;
   }
 
+  // ── Send ──────────────────────────────────────────────────────
   function sendMessage() {
     const prompt = inputEl.value.trim();
     if (!prompt || isStreaming) return;
 
-    // Show user message
+    addDivider();
     appendMessage('user', prompt);
-    inputEl.value = '';
+    inputEl.value      = '';
     inputEl.style.height = 'auto';
 
-    // Rough token estimate for input
     const inputTokens = Math.ceil(prompt.length / 4);
-
     setLoading(true);
 
-    // Create assistant bubble with cursor
+    // Assistant bubble — starts in streaming (pre-wrap) mode
     const bubble = appendMessage('assistant');
     const cursor = document.createElement('span');
     cursor.className = 'cursor';
@@ -528,73 +626,53 @@
 
     let fullText = '';
 
-    // Connect to SSE stream
-    const url = `/chat/stream?prompt=${encodeURIComponent(prompt)}`;
-    const es = new EventSource(url);
+    // BUG 2 FIX: EventSource sends tokens that may include \n characters.
+    // While streaming we use textContent + white-space:pre-wrap so they
+    // render correctly as line breaks instead of collapsing or going vertical.
+    const es = new EventSource(`/chat/stream?prompt=${encodeURIComponent(prompt)}`);
 
     es.onmessage = (e) => {
-      const token = e.data;
-      fullText += token;
-      // Update bubble text, keep cursor at end
+      fullText += e.data;
+      // Update raw text — cursor stays at end
       bubble.textContent = fullText;
       bubble.appendChild(cursor);
       scrollToBottom();
     };
 
-    es.onerror = () => {
+    const onDone = () => {
       es.close();
       cursor.remove();
-
-      if (!fullText) {
-        bubble.textContent = '⚠ Stream error — check your API key or server logs.';
-        bubble.parentElement.parentElement.classList.add('error');
-      }
-
+      // BUG 1 FIX: render full accumulated text as markdown now that
+      // streaming is complete — code blocks, inline code, lists etc.
+      renderMarkdown(bubble, fullText);
       const outputTokens = Math.ceil(fullText.length / 4);
       updateCounters(inputTokens + outputTokens);
       setLoading(false);
       inputEl.focus();
     };
 
-    // Some providers send a [DONE] signal — handle cleanly
-    es.addEventListener('done', () => {
-      es.close();
-      cursor.remove();
-      const outputTokens = Math.ceil(fullText.length / 4);
-      updateCounters(inputTokens + outputTokens);
-      setLoading(false);
-      inputEl.focus();
-    });
+    es.onerror = onDone;               // stream closed = done for Groq
+    es.addEventListener('done', onDone); // explicit done event if sent
   }
 
+  // ── Reset ─────────────────────────────────────────────────────
   async function resetChat() {
     if (isStreaming) return;
-    try {
-      await fetch('/chat/reset', { method: 'DELETE' });
-    } catch (e) {
-      console.warn('Reset endpoint error:', e);
-    }
+    try { await fetch('/chat/reset', { method: 'DELETE' }); } catch (_) {}
 
-    // Clear UI
-    messagesEl.innerHTML = '';
-    const empty = document.createElement('div');
-    empty.className = 'empty-state';
-    empty.id = 'empty-state';
-    empty.innerHTML = `
-      <div class="empty-icon">⚡</div>
-      <div class="empty-title">history cleared</div>
-      <div class="empty-sub">Session reset. Start a fresh conversation.</div>
-    `;
-    messagesEl.appendChild(empty);
+    messagesEl.innerHTML = `
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">💬</div>
+        <div class="empty-title">History cleared</div>
+        <div class="empty-sub">Start a fresh conversation.</div>
+      </div>`;
 
-    sessionTokens = 0;
-    messageCount  = 0;
+    sessionTokens = 0; turnCount = 0;
     document.getElementById('token-count').textContent = '0';
-    document.getElementById('msg-count').textContent  = '0';
+    document.getElementById('msg-count').textContent   = '0';
     inputEl.focus();
   }
 
-  // Focus input on load
   inputEl.focus();
 </script>
 </body>
