@@ -1,20 +1,22 @@
 from fastapi import FastAPI
 import os
 import json
+from app.routers import StreamSSE
 import httpx
+from app.core.groq_client import get_client
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from groq import Groq
 load_dotenv()
 
 app = FastAPI()
-
-client = Groq(
-    api_key=os.getenv("GROQ_API_KEY"),
-)
-converstation_history = [
+app.include_router(StreamSSE.router)
+client = get_client()
+conversation_history = [
     {"role": "system", "content": "You are a helpful assistant and you give only answers."}
 ]
+
+
 class chatRequest(BaseModel):
     prompt:str
 
@@ -43,17 +45,17 @@ def chat(request: chatRequest) -> chatResponse:
 
 @app.post("/chatHistory")
 def chatHistory(request: chatRequest) -> chatResponse:
-    converstation_history.append({
+    conversation_history.append({
         "role":"user",
         "content":request.prompt
     })
 
     chat_completion = client.chat.completions.create(
-        messages=converstation_history,
+        messages=conversation_history,
         model="llama-3.3-70b-versatile"
     )
     assistant_reply = chat_completion.choices[0].message.content
-    converstation_history.append({
+    conversation_history.append({
         "role": "assistant",
         "content": assistant_reply
     })
@@ -62,17 +64,21 @@ def chatHistory(request: chatRequest) -> chatResponse:
         )
 
 
+
+
 @app.delete("/chat/reset")
 def delHistory():
-    converstation_history.clear()
-    converstation_history.append(
+    conversation_history.clear()
+    conversation_history.append(
         {"role": "system", "content": "You are a helpful assistant and you give only answers."}
     )
     return {"History":"deleted"}
 
+
+
 @app.get("/history")
 def getHistory():
-    return {"history": converstation_history}
+    return {"history": conversation_history}
 
 
 @app.post("/chatMore")
